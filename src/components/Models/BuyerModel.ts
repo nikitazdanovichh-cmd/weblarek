@@ -1,4 +1,5 @@
 import { IBuyer, FormErrors, TPayment } from '../../types';
+import { IEvents } from '../base/Events';
 
 export class BuyerModel {
     protected payment: TPayment | null = null;
@@ -6,23 +7,12 @@ export class BuyerModel {
     protected email: string = '';
     protected phone: string = '';
 
-setField<K extends keyof IBuyer>(field: K, value: IBuyer[K]): void {
-    Object.assign(this, { [field]: value });
-}
-    getData(): IBuyer {
-        return {
-            payment: this.payment,
-            address: this.address,
-            email: this.email,
-            phone: this.phone
-        };
-    }
+    constructor(protected events: IEvents) {}
 
-    clear(): void {
-        this.payment = null;
-        this.address = '';
-        this.email = '';
-        this.phone = '';
+    setField<K extends keyof IBuyer>(field: K, value: IBuyer[K]): void {
+        Object.assign(this, { [field]: value });
+        // Изменение данных
+        this.events.emit('buyer:changed');
     }
 
     validate(): FormErrors {
@@ -33,5 +23,18 @@ setField<K extends keyof IBuyer>(field: K, value: IBuyer[K]): void {
         if (!this.phone) errors.phone = 'Укажите телефон';
         
         return errors;
+    }
+
+    getData(): IBuyer {
+        return { payment: this.payment, address: this.address, email: this.email, phone: this.phone };
+    }
+
+    clear(): void {
+        this.payment = null;
+        this.address = '';
+        this.email = '';
+        this.phone = '';
+        // Очистка данных
+        this.events.emit('buyer:changed');
     }
 }
