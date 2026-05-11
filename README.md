@@ -65,7 +65,8 @@ yarn build
 Базовый класс для всех компонентов интерфейса. Является дженериком и принимает в переменной `T` тип данных, которые могут быть переданы в метод `render`.
 
 * **Конструктор:** `constructor(protected readonly container: HTMLElement)` — принимает ссылку на DOM-элемент контейнера.
-* **Методы:** * `render(data?: Partial<T>): HTMLElement` — записывает данные в поля класса через сеттеры и возвращает корневой элемент.
+* **Методы:** 
+* `render(data?: Partial<T>): HTMLElement` — записывает данные в поля класса через сеттеры и возвращает корневой элемент.
 * `setImage(element: HTMLImageElement, src: string, alt?: string): void` — утилитарный метод для установки изображений.
 
 
@@ -75,7 +76,8 @@ yarn build
 Содержит в себе базовую логику отправки запросов.
 
 * **Конструктор:** `constructor(baseUrl: string, options: RequestInit = {})` — принимает базовый URL и опциональные настройки запроса.
-* **Методы:** * `get(uri: string): Promise<object>` — выполняет GET-запрос.
+* **Методы:** 
+* `get(uri: string): Promise<object>` — выполняет GET-запрос.
 * `post(uri: string, data: object, method: ApiPostMethods = 'POST'): Promise<object>` — выполняет POST/PUT/DELETE-запросы.
 * `protected handleResponse(response: Response): Promise<object>` — проверяет ответ сервера на корректность.
 
@@ -101,7 +103,8 @@ yarn build
 Расширяет базовый класс `Api`. Отвечает за конкретные эндпоинты проекта.
 
 * **Конструктор:** `constructor(cdn: string, baseUrl: string, options?: RequestInit)`
-* **Методы:** * `getProductList(): Promise<IProduct[]>` — получение каталога товаров.
+* **Методы:** 
+* `getProductList(): Promise<IProduct[]>` — получение каталога товаров.
 * `orderProducts(order: IOrder): Promise<IOrderResult>` — отправка данных заказа на сервер.
 
 
@@ -173,7 +176,7 @@ yarn build
 
 
 
-### Класс `Form<T>`
+### Класс `Form`
 
 Базовый класс для всех форм. Управляет валидацией, отображением ошибок и активностью кнопки submit.
 
@@ -192,7 +195,8 @@ yarn build
 Наследуется от `Form`. Отвечает за форму контактных данных.
 
 * **Конструктор:** `constructor(container: HTMLFormElement, events: IEvents)`
-* **Сеттеры:** * `set phone(value: string)` — устанавливает значение в input телефона.
+* **Сеттеры:** 
+* `set phone(value: string)` — устанавливает значение в input телефона.
 * `set email(value: string)` — устанавливает значение в input почты.
 
 
@@ -294,7 +298,3 @@ yarn build
 ## Взаимодействие слоев (Презентер)
 
 Роль Презентера выполняет скрипт `src/main.ts`. Он инициализирует экземпляры моделей и представлений, а затем связывает их с помощью брокера событий (`EventEmitter`). В обработчиках событий (колбэках) Презентер вызывает методы слоев данных и передает измененные данные в методы рендера слоя представлений.
-
-```
-
-```
