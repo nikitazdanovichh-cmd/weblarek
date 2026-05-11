@@ -3,17 +3,17 @@
 Стек: HTML, SCSS, TS, Vite
 
 Структура проекта:
-- src/ — исходные файлы проекта
-- src/components/ — папка с JS компонентами
-- src/components/Models/ — папка с моделями данных
+- `src/` — исходные файлы проекта
+- `src/components/` — папка с JS компонентами
+- `src/components/Models/` — папка с моделями данных
 
 Важные файлы:
-- index.html — HTML-файл главной страницы
-- src/types/index.ts — файл с типами
-- src/main.ts — точка входа приложения
-- src/scss/styles.scss — корневой файл стилей
-- src/utils/constants.ts — файл с константами
-- src/utils/utils.ts — файл с утилитами
+- `index.html` — HTML-файл главной страницы
+- `src/types/index.ts` — файл с типами
+- `src/main.ts` — точка входа приложения
+- `src/scss/styles.scss` — корневой файл стилей
+- `src/utils/constants.ts` — файл с константами
+- `src/utils/utils.ts` — файл с утилитами
 
 ## Установка и запуск
 Для установки и запуска проекта необходимо выполнить команды
