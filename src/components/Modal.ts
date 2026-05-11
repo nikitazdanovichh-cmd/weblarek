@@ -34,16 +34,12 @@ export class Modal extends Component<IModalData> {
     open() {
         this.container.classList.add('modal_active');
         this._active = true;
-        // Блокировка скролла страницы
-        document.body.classList.add('page__wrapper_locked');
     }
 
     close() {
         this.container.classList.remove('modal_active');
         this.content = null; 
         this._active = false;
-        // Разблокировка скролла страницы
-        document.body.classList.remove('page__wrapper_locked');
     }
 
     render(data: IModalData): HTMLElement {

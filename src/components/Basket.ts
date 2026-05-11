@@ -24,6 +24,10 @@ export class Basket extends Component<IBasketView> {
             this.events.emit('order:open');
         });
 
+        // Изначально блокируем кнопку оформления заказа
+        this.buttonElement.disabled = true;
+
+        // При пустом массиве сработает логика из сеттера
         this.items = [];
     }
 
@@ -33,7 +37,14 @@ export class Basket extends Component<IBasketView> {
     }
 
     set items(items: HTMLElement[]) {
-        this.listElement.replaceChildren(...items);
+        if (items.length) {
+            this.listElement.replaceChildren(...items);
+        } else {
+            // Если массив пустой, отрисовываем сообщение
+            const emptyMessage = document.createElement('p');
+            emptyMessage.textContent = 'Корзина пуста';
+            this.listElement.replaceChildren(emptyMessage);
+        }
     }
 
     set total(total: number) {

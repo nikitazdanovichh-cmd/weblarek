@@ -6,10 +6,13 @@ import { Api } from './components/base/Api';
 import { LarekApi } from './components/LarekApi';
 import { API_URL, CDN_URL } from './utils/constants';
 import { EventEmitter } from './components/base/Events';
-import { Header, Gallery } from './components/Page';
-import { CardCatalog, CardPreview, CardBasket } from './components/Card';
+import { Header } from './components/Header';
+import { Gallery } from './components/Gallery';
+import { CardCatalog } from './components/CardCatalog';
+import { CardPreview } from './components/CardPreview';
+import { CardBasket } from './components/CardBasket';
 import { Modal } from './components/Modal';
-import { Form } from './components/Form';
+import { Contacts } from './components/Contacts';
 import { Basket } from './components/Basket';
 import { Order } from './components/Order';
 import { Success } from './components/Success';
@@ -36,9 +39,14 @@ const gallery = new Gallery(document.body);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basketView = new Basket(cloneTemplate(basketTemplate), events);
 const orderView = new Order(cloneTemplate(orderTemplate), events);
-const contactsView = new Form<IBuyer>(cloneTemplate(contactsTemplate), events);
+const contactsView = new Contacts(cloneTemplate(contactsTemplate), events);
 const successView = new Success(cloneTemplate(successTemplate), {
     onClick: () => modal.close()
+});
+
+// Превью пересоздавать не нужно, инициализируем 1 раз
+const cardPreview = new CardPreview(cloneTemplate(cardPreviewTemplate), {
+    onClick: () => events.emit('card:toBasket') 
 });
 
 events.on('catalog:changed', () => {
@@ -59,25 +67,33 @@ events.on('preview:changed', () => {
     const item = catalog.getPreview();
     if (!item) return;
 
-    const card = new CardPreview(cloneTemplate(cardPreviewTemplate), {
-        onClick: () => events.emit('card:toBasket', item)
-    });
+    if (item.price === null) {
+        cardPreview.buttonText = 'Недоступно';
+        cardPreview.disabled = true;
+    } else {
+        cardPreview.buttonText = basket.isInBasket(item.id) ? 'Удалить из корзины' : 'В корзину';
+        cardPreview.disabled = false;
+    }
 
     modal.render({
-        content: card.render({
-            ...item,
-            buttonText: basket.isInBasket(item.id) ? 'Удалить из корзины' : 'В корзину'
-        })
+        content: cardPreview.render(item)
     });
 });
 
-events.on('card:toBasket', (item: IProduct) => {
-    if (basket.isInBasket(item.id)) {
-        basket.removeItem(item.id);
-    } else {
-        basket.addItem(item);
+events.on('card:toBasket', () => {
+    const item = catalog.getPreview();
+    if (item) {
+        if (basket.isInBasket(item.id)) {
+            basket.removeItem(item.id);
+        } else {
+            basket.addItem(item);
+        }
+        modal.close();
     }
-    modal.close();
+});
+
+events.on('basket:removeFromBasket', (item: IProduct) => {
+    basket.removeItem(item.id);
 });
 
 events.on('basket:changed', () => {
@@ -85,7 +101,7 @@ events.on('basket:changed', () => {
     
     const items = basket.getItems().map((item, index) => {
         const card = new CardBasket(cloneTemplate(cardBasketTemplate), {
-            onClick: () => basket.removeItem(item.id)
+            onClick: () => events.emit('basket:removeFromBasket', item)
         });
         return card.render({
             title: item.title,
@@ -94,23 +110,14 @@ events.on('basket:changed', () => {
         });
     });
 
-    const content = basketView.render({
-        items: items.length > 0 ? items : [(() => {
-            const p = document.createElement('p');
-            p.textContent = 'Корзина пуста';
-            return p;
-        })()],
+    basketView.render({
+        items: items,
         total: basket.getTotal(),
         valid: basket.getCount() > 0
     });
-
-    if (modal.active && modal.render({}).querySelector('.basket')) {
-        modal.render({ content });
-    }
 });
 
 events.on('basket:open', () => {
-    events.emit('basket:changed');
     modal.render({ content: basketView.render() });
 });
 
@@ -138,11 +145,11 @@ events.on(/^order\..*:change|^contacts\..*:change/, (data: { field: keyof IBuyer
 });
 
 events.on('order:open', () => {
-    modal.render({ content: orderView.render(buyer.getData()) });
+    modal.render({ content: orderView.render() });
 });
 
 events.on('order:submit', () => {
-    modal.render({ content: contactsView.render(buyer.getData()) });
+    modal.render({ content: contactsView.render() });
 });
 
 events.on('contacts:submit', () => {
@@ -155,8 +162,6 @@ events.on('contacts:submit', () => {
         modal.render({ content: successView.render({ total: result.total }) });
         basket.clear();
         buyer.clear();
-        (orderView.render() as HTMLFormElement).reset();
-        (contactsView.render() as HTMLFormElement).reset();
     })
     .catch(console.error);
 });
